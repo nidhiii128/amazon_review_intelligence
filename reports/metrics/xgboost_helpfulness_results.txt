@@ -1,0 +1,22 @@
+=== XGBoost Review Helpfulness Prediction ===
+Label: helpful_vote >= 1 -> 'helpful' (26.2% of reviews), else 'less_helpful'
+Best hyperparameters: {'subsample': 0.7, 'n_estimators': 200, 'max_depth': 6, 'learning_rate': 0.01, 'colsample_bytree': 0.7}
+
+Accuracy: 0.7049
+Precision (helpful): 0.4584
+Recall (helpful): 0.7023
+F1 (helpful): 0.5547
+
+Classification report:
+              precision    recall  f1-score   support
+
+less_helpful      0.870     0.706     0.779      7383
+     helpful      0.458     0.702     0.555      2617
+
+    accuracy                          0.705     10000
+   macro avg      0.664     0.704     0.667     10000
+weighted avg      0.762     0.705     0.721     10000
+
+Confusion matrix (rows=true, cols=pred), label order = less_helpful, helpful:
+[[5211 2172]
+ [ 779 1838]]

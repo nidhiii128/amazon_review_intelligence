@@ -1,0 +1,3 @@
+# Extra requirement for Milestone 7 (dashboard). Separate file so the
+# earlier milestones don't need it.
+streamlit

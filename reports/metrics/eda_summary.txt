@@ -1,0 +1,31 @@
+Total reviews: 50,000
+Unique products (asin): 37,414
+Unique users: 8,883
+Date range: 2000-10-07 14:21:50 to 2023-03-18 02:35:08.237000
+Verified purchase rate: 80.17%
+Average rating: 4.25
+Average review length (words): 71.7
+
+Rating distribution:
+rating
+1.0     4165
+2.0     2124
+3.0     3506
+4.0     7616
+5.0    32589
+
+Sentiment label distribution (derived from rating):
+sentiment_label
+positive    40205
+negative     6289
+neutral      3506
+
+Helpful vote stats:
+count    50000.000000
+mean         1.424120
+std         12.279794
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          1.000000
+max       1421.000000

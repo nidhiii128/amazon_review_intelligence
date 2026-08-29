@@ -1,0 +1,18 @@
+=== VADER Baseline Sentiment Classification ===
+Accuracy: 0.8156
+
+Classification report:
+              precision    recall  f1-score   support
+
+    negative      0.585     0.533     0.558      6289
+     neutral      0.105     0.079     0.090      3506
+    positive      0.893     0.924     0.908     40205
+
+    accuracy                          0.816     50000
+   macro avg      0.528     0.512     0.519     50000
+weighted avg      0.799     0.816     0.807     50000
+
+Confusion matrix (rows=true, cols=pred), label order = negative, neutral, positive:
+[[ 3352   721  2216]
+ [  971   278  2257]
+ [ 1406  1647 37152]]

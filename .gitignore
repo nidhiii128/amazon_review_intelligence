@@ -1,0 +1,14 @@
+# Raw & processed data (regenerate via src/data_prep.py)
+data/raw/
+data/processed/
+
+# Trained models, embeddings, vectorizers (regenerate via each milestone's script)
+models/
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+
+# Editor/OS cruft
+.DS_Store
+Thumbs.db

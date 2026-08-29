@@ -1,0 +1,24 @@
+=== DistilBERT Fine-tuned Sentiment Classification ===
+Device: cpu
+Train size: 6,000 | Test size: 10,000
+Epochs: 2 | Batch size: 8 | Max seq length: 128
+Total time: 60.2 minutes
+
+Accuracy: 0.8989
+Macro F1: 0.7022
+
+Classification report:
+              precision    recall  f1-score   support
+
+    negative      0.706     0.873     0.780      1258
+     neutral      0.471     0.302     0.368       701
+    positive      0.961     0.955     0.958      8041
+
+    accuracy                          0.899     10000
+   macro avg      0.712     0.710     0.702     10000
+weighted avg      0.894     0.899     0.894     10000
+
+Confusion matrix (rows=true, cols=pred), label order = negative, neutral, positive:
+[[1098   71   89]
+ [ 263  212  226]
+ [ 195  167 7679]]

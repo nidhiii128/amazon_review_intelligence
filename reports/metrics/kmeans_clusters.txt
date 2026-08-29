@@ -1,0 +1,19 @@
+=== Review Clustering (KMeans on TF-IDF) ===
+
+Cluster 0 (19,309 reviews, avg rating 3.97):
+  use, work, easy, just, like, camera, don, great, works, usb
+
+Cluster 1 (3,570 reviews, avg rating 4.80):
+  works, works great, great, stars, stars works, stars great, great works, good, works perfectly, works fine
+
+Cluster 2 (13,552 reviews, avg rating 4.24):
+  stars, great, good, perfect, price, case, nice, buy, worked, fit
+
+Cluster 3 (3,228 reviews, avg rating 4.80):
+  product, love, great product, great, good product, stars, good, stars love, product great, stars great
+
+Cluster 4 (5,101 reviews, avg rating 4.52):
+  laptop, good, fits, nice, like, bag, case, stars good, really, stars
+
+Cluster 5 (5,240 reviews, avg rating 4.30):
+  sound, quality, good, great, sound quality, headphones, speaker, good quality, price, ear

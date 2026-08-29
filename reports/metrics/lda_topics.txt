@@ -1,0 +1,23 @@
+Topic 0 (sound, speaker, music):
+  sound, speaker, music, speakers, audio, bluetooth, quality, volume, like, noise, good, use
+
+Topic 1 (card, ipad, cord):
+  card, ipad, cord, apple, sd, money, charging, does, sd card, phone, waste, micro
+
+Topic 2 (great, works, works great):
+  great, works, works great, drive, price, screen, good, stars, use, easy, computer, work
+
+Topic 3 (usb, power, like):
+  usb, power, like, good, use, just, nice, laptop, work, mouse, great, product
+
+Topic 4 (camera, great, tv):
+  camera, great, tv, use, good, easy, product, light, video, mount, just, nice
+
+Topic 5 (case, good, like):
+  case, good, like, fit, just, perfect, love, tablet, use, nice, great, keyboard
+
+Topic 6 (great, sound, phone):
+  great, sound, phone, good, use, quality, work, easy, like, headphones, time, just
+
+Topic 7 (cable, cables, router):
+  cable, cables, router, use, need, review, wifi, hdmi, like, just, devices, signal

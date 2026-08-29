@@ -1,0 +1,44 @@
+=== TF-IDF + Logistic Regression ===
+Accuracy: 0.8595
+Macro F1: 0.6894
+
+Classification report:
+              precision    recall  f1-score   support
+
+    negative      0.695     0.776     0.733      1258
+     neutral      0.324     0.521     0.400       701
+    positive      0.971     0.902     0.935      8041
+
+    accuracy                          0.860     10000
+   macro avg      0.663     0.733     0.689     10000
+weighted avg      0.891     0.860     0.872     10000
+
+Confusion matrix (rows=true, cols=pred), label order = negative, neutral, positive:
+[[ 976  205   77]
+ [ 197  365  139]
+ [ 232  555 7254]]
+
+=== TF-IDF + Linear SVM ===
+Accuracy: 0.8879
+Macro F1: 0.6932
+
+Classification report:
+              precision    recall  f1-score   support
+
+    negative      0.745     0.749     0.747      1258
+     neutral      0.415     0.354     0.382       701
+    positive      0.945     0.956     0.950      8041
+
+    accuracy                          0.888     10000
+   macro avg      0.702     0.686     0.693     10000
+weighted avg      0.883     0.888     0.885     10000
+
+Confusion matrix (rows=true, cols=pred), label order = negative, neutral, positive:
+[[ 942  142  174]
+ [ 177  248  276]
+ [ 145  207 7689]]
+
+=== Model Comparison Summary ===
+Model                              Accuracy    Macro F1    
+TF-IDF + Logistic Regression       0.8595      0.6894      
+TF-IDF + Linear SVM                0.8879      0.6932      

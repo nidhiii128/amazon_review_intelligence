@@ -1,0 +1,35 @@
+Question: "What is the biggest complaint about battery life?"
+Answer: The battery life stinks
+Supporting reviews:
+  - [similarity 0.621, rating 5.0/5] "The battery life. I love that it has so many apps that I needed!..."
+  - [similarity 0.615, rating 3.0/5] "Battery life. It's ok, I'm having trouble with some of them holding a charge on the battery. Only lasts 4-6 months, then it either gives you no warnin..."
+  - [similarity 0.610, rating 5.0/5] "Exceeded expectations!. There is nothing I dislike about these! Battery life is incredible. Bought my daughter one after mine..."
+  - [similarity 0.581, rating 5.0/5] "A battery life of 12+ hours.... Gives a weird beeping noise when power is low. The blue circle on top is the volume control. If one touches a certain ..."
+  - [similarity 0.573, rating 2.0/5] "battery life stinks. small and simple to use only thing I dislike is that the battery life stinks big time it would have been nice if it came with a c..."
+
+Question: "Is the camera good for low light photos?"
+Answer: Yes
+Supporting reviews:
+  - [similarity 0.783, rating 3.0/5] "At this price the pictures should be better in low light. It only took OKAY pictures, There was a lot of noise in the pictures. Maybe I just got a bad..."
+  - [similarity 0.677, rating 5.0/5] "This is a wonderful camera! I have used it a few times .... This is a wonderful camera! I have used it a few times now and it takes the sharpest pictu..."
+  - [similarity 0.611, rating 4.0/5] "Not the best after dark, great during daytime hours. Works great in lit areas not so good at night, pictures become a bit blurry. If there is any ligh..."
+  - [similarity 0.595, rating 2.0/5] "Poor image quality.. This camera is well build and cool. Focus fast. Video quality is ok. But Image is grainy even in bright daytime. Worse than my se..."
+  - [similarity 0.592, rating 5.0/5] "I love it!. I purchased two of these, one for my brother and one for myself for an upcoming trip that we are going on. Some of the sites we are seeing..."
+
+Question: "Is this product good value for the price?"
+Answer: Yes
+Supporting reviews:
+  - [similarity 0.725, rating 5.0/5] "Good Value for the price. Good Value for the price..."
+  - [similarity 0.703, rating 5.0/5] "Good value for the price. Quality made product.. Good value for the price. Quality made product. I even like the assorted colors. I would recommend...."
+  - [similarity 0.680, rating 5.0/5] "Good value for the price.. Good value for the price...."
+  - [similarity 0.652, rating 4.0/5] "Good value. Adequate especially for the price..."
+  - [similarity 0.647, rating 5.0/5] "Good for theprice. Good for the price..."
+
+Question: "Is this good for cutting cable TV?" (product B00ZV9RDKK)
+Answer: Yes
+Supporting reviews:
+  - [similarity 0.646, rating 5.0/5] "Great cable cutter. I loved that it gave me live tv with directv now. I however wish the voice remote worked better for navigating while using this se..."
+  - [similarity 0.521, rating 5.0/5] "Cut your Cable. So easy. Watching TV is an adventure now!!..."
+  - [similarity 0.422, rating 5.0/5] "Great device.. For me, this is easier and better than the full Fire TV. I use it in conjunction with Apple TV, and switch between the two, with no cab..."
+  - [similarity 0.412, rating 5.0/5] "Great Product - Will not go back to cable.. Got rid of cable and just kept high speed Internet. Signed up for SlingTV and along with my Amazon Prime b..."
+  - [similarity 0.399, rating 5.0/5] "Works great!!. bye bye Cable...I added Kodi to it...Should've gotten this years ago...... Works great!!!..."

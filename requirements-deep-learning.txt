@@ -1,0 +1,7 @@
+# Extra requirements for the "heavy neural" milestones: Milestone 3 (BERT
+# fine-tuning) and Milestone 5 (semantic search embeddings). Kept separate
+# from requirements.txt because torch is a large download and not needed
+# for the classical NLP / ML milestones.
+torch
+transformers
+sentence-transformers

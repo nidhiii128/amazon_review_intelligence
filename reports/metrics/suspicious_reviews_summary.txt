@@ -1,0 +1,12 @@
+=== Unsupervised Suspicious Review Detection (Isolation Forest) ===
+No labelled fake/genuine ground truth exists for this dataset -- this is
+anomaly detection over review features, not a fake-review classifier, and
+no accuracy figure is reported for that reason.
+
+Reviews analysed: 50,000
+Features: rating, review_length_words, capital_ratio, exclamation_count, verified_purchase_int, review_age_days, max_similarity_within_product
+Contamination (target flagged rate): 10%
+
+Normal: 45,000 (90.0%)
+Potentially suspicious: 5,000 (10.0%)
+Near-duplicate reviews (similarity >= 0.95): 36

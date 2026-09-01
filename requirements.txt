@@ -7,3 +7,4 @@ vaderSentiment
 nltk
 tqdm
 joblib
+requests

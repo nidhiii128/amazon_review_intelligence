@@ -9,6 +9,9 @@ models/
 __pycache__/
 *.pyc
 
+# Virtual environment
+.venv/
+
 # Editor/OS cruft
 .DS_Store
 Thumbs.db

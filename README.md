@@ -80,9 +80,15 @@ python3 src/semantic_search/search.py             # demo queries
 python3 src/semantic_search/search.py "is the camera good in low light"  # your own query
 
 # Milestone 6 (reuses the embeddings from Milestone 5 -- build those first):
-python3 src/rag_chatbot/rag_pipeline.py                                          # demo questions
-python3 src/rag_chatbot/rag_pipeline.py "is the battery good"                    # your own question
-python3 src/rag_chatbot/rag_pipeline.py "good for gaming" --asin B00ZV9RDKK      # scoped to one product
+python3 src/rag_chatbot/rag_pipeline.py                                                    # demo questions
+python3 src/rag_chatbot/rag_pipeline.py "is the battery good"                              # your own question
+python3 src/rag_chatbot/rag_pipeline.py "good for gaming" --parent-asin B00ZV9RDKK         # scoped to one product
+
+# Product metadata integration (needed before Milestone 7 for product names/images):
+python3 src/metadata_prep.py                # -> data/processed/products.csv
+
+# Suspicious review detection (needs the Milestone 5 embeddings):
+python3 src/advanced_ml/suspicious_reviews.py   # -> data/processed/suspicious_reviews.csv
 
 # Milestone 7 (run from the amazon-review-intelligence/ folder):
 pip install -r requirements-dashboard.txt
@@ -173,9 +179,11 @@ offline after the one-time download) -> generate an answer -> print the
 answer AND the supporting reviews it was grounded in, so the answer is
 never just an unverifiable LLM guess.
 
-Supports an optional `--asin` filter so a question can be scoped to one
-product (the buyer-facing "ask about THIS product" use case), falling
-back to the full corpus if that product has no reviews. If `google/flan-t5-small`'s
+Supports an optional `--parent-asin` filter so a question can be scoped to
+one product listing (the buyer-facing "ask about THIS product" use case),
+falling back to the full corpus if that product has no reviews. Scoping is
+on `parent_asin` rather than the variant-level `asin` so color/size
+variants of the same listing are treated as one product. If `google/flan-t5-small`'s
 answers feel too generic, `google/flan-t5-base` is a drop-in swap
 (`FLAN_MODEL_NAME` at the top of the file) for noticeably better quality
 at the cost of a larger download and slower inference.
@@ -187,34 +195,33 @@ run, same as the other neural milestones.
 
 ## Milestone 7 notes (dashboard)
 
-Two views exactly matching the brief, selectable from the sidebar:
+A 9-page app (`src/dashboard/app.py` as a thin sidebar router, one module
+per page under `src/dashboard/pages/`), matching the finalized information
+architecture: Home, Explore Products, Product Insights (Overview / Aspect
+Analysis / Customer Reviews / Review Trust tabs), Compare Products, Ask
+ReviewIQ, Business Intelligence (Overview / Complaint & Aspect
+Intelligence / Topics & Discussions / Review Quality & Trust tabs), Model
+Insights, and About. No login/authentication.
 
-- **Buyer view** ("should I buy this?"): pick a product (by ASIN + avg
-  rating + review count -- this dataset only pulled review-level fields,
-  no product-title metadata, so ASIN is the identifier), see strengths/
-  weaknesses, aspect-level sentiment, what topics its reviews cover,
-  side-by-side product comparison, and the RAG chatbot scoped to that
-  product.
-- **Company view** ("what should we improve?"): top complaint areas
-  across the whole sample, all the Milestone 1-4 result charts pulled in
-  directly (sentiment comparison, ABSA, LDA topics, XGBoost feature
-  importance, KMeans clusters -- whichever have been generated so far;
-  anything not run yet shows a friendly "not generated" message instead
-  of crashing), a per-product deep-dive table, and expandable full-text
-  versions of every metrics report.
+Products are identified by **name** (from `products.csv`, see "Product
+metadata integration" below) rather than raw ASIN, with a graceful
+`"Product {parent_asin}"` fallback for the small number of products the
+metadata fetch didn't find. Everything is grouped by `parent_asin` (the
+product listing), not the variant-level `asin`, so color/size variants
+roll up into one product -- this applies to the product picker, aspect
+sentiment, RAG scoping, and comparisons alike.
 
 The chatbot only loads its models (torch + transformers + embeddings) the
 first time you actually ask it a question, not on dashboard startup --
 otherwise every page load would pay that cost even for people just
-browsing charts.
+browsing charts. The Compare page's "AI Comparison" sentence and the
+Insights page's "AI Summary" are template-generated from computed stats,
+not LLM calls -- only the Ask ReviewIQ page calls the RAG chatbot.
 
-I split the data logic (`data_helpers.py`) from the UI (`app.py`) on
-purpose so the analysis functions could be verified directly against your
-real data without needing a running Streamlit session -- all of them
-(product picker, aspect sentiment lookup, strengths/weaknesses, topic
-mix, corpus-wide complaints) checked out against the actual 50k-review
-dataset. I also started the app itself in a background server and
-confirmed it serves successfully with no startup errors.
+`data_helpers.py` stays the pure data-logic layer (testable without a
+running Streamlit session), `theme.py` holds shared styling/display
+helpers, and `widgets.py` holds the shared product-picker/card-grid
+component reused across Explore / Insights / Compare.
 
 ## Roadmap (matches the original project brief)
 
@@ -298,9 +305,11 @@ offline after the one-time download) -> generate an answer -> print the
 answer AND the supporting reviews it was grounded in, so the answer is
 never just an unverifiable LLM guess.
 
-Supports an optional `--asin` filter so a question can be scoped to one
-product (the buyer-facing "ask about THIS product" use case), falling
-back to the full corpus if that product has no reviews. If `google/flan-t5-small`'s
+Supports an optional `--parent-asin` filter so a question can be scoped to
+one product listing (the buyer-facing "ask about THIS product" use case),
+falling back to the full corpus if that product has no reviews. Scoping is
+on `parent_asin` rather than the variant-level `asin` so color/size
+variants of the same listing are treated as one product. If `google/flan-t5-small`'s
 answers feel too generic, `google/flan-t5-base` is a drop-in swap
 (`FLAN_MODEL_NAME` at the top of the file) for noticeably better quality
 at the cost of a larger download and slower inference.
@@ -312,34 +321,33 @@ run, same as the other neural milestones.
 
 ## Milestone 7 notes (dashboard)
 
-Two views exactly matching the brief, selectable from the sidebar:
+A 9-page app (`src/dashboard/app.py` as a thin sidebar router, one module
+per page under `src/dashboard/pages/`), matching the finalized information
+architecture: Home, Explore Products, Product Insights (Overview / Aspect
+Analysis / Customer Reviews / Review Trust tabs), Compare Products, Ask
+ReviewIQ, Business Intelligence (Overview / Complaint & Aspect
+Intelligence / Topics & Discussions / Review Quality & Trust tabs), Model
+Insights, and About. No login/authentication.
 
-- **Buyer view** ("should I buy this?"): pick a product (by ASIN + avg
-  rating + review count -- this dataset only pulled review-level fields,
-  no product-title metadata, so ASIN is the identifier), see strengths/
-  weaknesses, aspect-level sentiment, what topics its reviews cover,
-  side-by-side product comparison, and the RAG chatbot scoped to that
-  product.
-- **Company view** ("what should we improve?"): top complaint areas
-  across the whole sample, all the Milestone 1-4 result charts pulled in
-  directly (sentiment comparison, ABSA, LDA topics, XGBoost feature
-  importance, KMeans clusters -- whichever have been generated so far;
-  anything not run yet shows a friendly "not generated" message instead
-  of crashing), a per-product deep-dive table, and expandable full-text
-  versions of every metrics report.
+Products are identified by **name** (from `products.csv`, see "Product
+metadata integration" below) rather than raw ASIN, with a graceful
+`"Product {parent_asin}"` fallback for the small number of products the
+metadata fetch didn't find. Everything is grouped by `parent_asin` (the
+product listing), not the variant-level `asin`, so color/size variants
+roll up into one product -- this applies to the product picker, aspect
+sentiment, RAG scoping, and comparisons alike.
 
 The chatbot only loads its models (torch + transformers + embeddings) the
 first time you actually ask it a question, not on dashboard startup --
 otherwise every page load would pay that cost even for people just
-browsing charts.
+browsing charts. The Compare page's "AI Comparison" sentence and the
+Insights page's "AI Summary" are template-generated from computed stats,
+not LLM calls -- only the Ask ReviewIQ page calls the RAG chatbot.
 
-I split the data logic (`data_helpers.py`) from the UI (`app.py`) on
-purpose so the analysis functions could be verified directly against your
-real data without needing a running Streamlit session -- all of them
-(product picker, aspect sentiment lookup, strengths/weaknesses, topic
-mix, corpus-wide complaints) checked out against the actual 50k-review
-dataset. I also started the app itself in a background server and
-confirmed it serves successfully with no startup errors.
+`data_helpers.py` stays the pure data-logic layer (testable without a
+running Streamlit session), `theme.py` holds shared styling/display
+helpers, and `widgets.py` holds the shared product-picker/card-grid
+component reused across Explore / Insights / Compare.
 
 ## Roadmap (matches the original project brief)
 
@@ -356,6 +364,50 @@ confirmed it serves successfully with no startup errors.
 6. **RAG chatbot** — DONE: retrieval-augmented generation over the review
    corpus using a free/local embedding model + local LLM, so buyers/
    companies can ask natural-language questions grounded in actual reviews.
-7. **Dashboard** — DONE: two Streamlit views (Buyer: strengths/weaknesses,
-   comparisons, chatbot; Company: complaints, aspect trends, helpfulness,
-   topics).
+7. **Product metadata integration** — DONE: `src/metadata_prep.py` joins
+   product title/brand/image onto the review sample via `parent_asin`.
+8. **Suspicious review detection** — DONE: unsupervised Isolation Forest
+   over review-level features + within-product embedding similarity.
+9. **Dashboard** — DONE: a 9-page Streamlit app (Home, Explore, Product
+   Insights, Compare, Ask ReviewIQ, Business Intelligence, Model Insights,
+   About) tying every milestone together, product names instead of raw
+   ASINs, and the Review Trust tab surfacing suspicious-review flags.
+
+## Product metadata integration notes
+
+`src/metadata_prep.py` streams `raw/meta_categories/meta_Electronics.jsonl`
+(~5.2 GB, not gzipped) from the same McAuley-Lab `Amazon-Reviews-2023`
+dataset on Hugging Face, keeping only rows whose `parent_asin` is one of
+the ~34,000 distinct parent_asins already in the 50k-review sample (stops
+early once every target is found). That raw match goes to
+`data/raw/meta_electronics_sample.jsonl`, then gets cleaned into
+`data/processed/products.csv` (`parent_asin, product_name, brand,
+image_url, main_category, average_rating, rating_number`). Needs only
+`requests` + stdlib `gzip`/`json` -- no `datasets` library dependency.
+Not every parent_asin in the review sample has a metadata match (some
+products are delisted/edge cases); those fall back to a generic
+`"Product {parent_asin}"` display in the dashboard rather than crashing.
+The reviews table itself is never modified -- the dashboard joins
+`electronics_reviews_clean.csv` and `products.csv` on `parent_asin` at
+load time, so re-running metadata_prep.py never requires reprocessing the
+50k reviews.
+
+## Suspicious review detection notes (Isolation Forest)
+
+`src/advanced_ml/suspicious_reviews.py` is unsupervised anomaly detection,
+not a fake-review classifier -- there is no labelled fake/genuine ground
+truth for this dataset, so no accuracy figure is reported anywhere in its
+output, and the UI never claims a review "is fake," only that it is
+"potentially suspicious based on automated pattern analysis." Features:
+rating, review length, capital-letter ratio, exclamation count, verified
+purchase, review age, and `max_similarity_within_product` -- the highest
+cosine similarity to any other review of the *same* parent_asin, reusing
+the Milestone 5 sentence embeddings (no new embedding pass), computed
+per-product rather than a full 50k x 50k matrix. `StandardScaler` +
+`IsolationForest(contamination=0.10)` flags ~10% of reviews; each flagged
+review also gets a short rule-based `reasons` string (e.g. "very short
+review", "near-duplicate text", "unusually high capital-letter ratio") for
+explainability, separate from the model's own anomaly score. On the actual
+50k-review sample, the highest-scoring flags are dominated by ALL-CAPS,
+exclamation-heavy angry reviews -- a sensible, explainable pattern, not
+evidence of coordinated fraud (which the tool doesn't claim to detect).

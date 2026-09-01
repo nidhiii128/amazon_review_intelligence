@@ -17,10 +17,14 @@ Needs the embeddings from src/semantic_search/build_embeddings.py to
 already exist (run that first if you haven't). Needs `transformers` +
 `torch` (already in requirements-deep-learning.txt).
 
+Scoping is on parent_asin (the product listing) rather than the
+variant-level asin, so color/size variants of the same listing are treated
+as one product -- matches how the dashboard groups reviews and metadata.
+
 Usage:
   python3 src/rag_chatbot/rag_pipeline.py                                   # demo questions
   python3 src/rag_chatbot/rag_pipeline.py "is the battery good"             # your own question
-  python3 src/rag_chatbot/rag_pipeline.py "is this good for gaming" --asin B00ZV9RDKK   # scoped to one product
+  python3 src/rag_chatbot/rag_pipeline.py "is this good for gaming" --parent-asin B00ZV9RDKK   # scoped to one product
 """
 import sys
 import pathlib
@@ -36,18 +40,28 @@ METRICS_DIR = BASE_DIR / "reports" / "metrics"
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
-FLAN_MODEL_NAME = "google/flan-t5-small"
+FLAN_MODEL_NAME = "google/flan-t5-base"
 TOP_K = 5
 MAX_CONTEXT_CHARS_PER_REVIEW = 300
 
+# Below this top-1 cosine similarity, retrieval is too weak to trust the
+# generator's answer -- small local LLMs like flan-t5-small don't reliably
+# follow "say you don't know" instructions on their own (verified: on an
+# unsupported question the retrieved top-1 similarity was ~0.18-0.25 vs
+# ~0.36-0.41 for a real but under-represented topic on the same product),
+# so this is a hard guardrail rather than relying purely on the prompt.
+MIN_SIMILARITY_THRESHOLD = 0.30
+INSUFFICIENT_INFO_ANSWER = "The available customer reviews do not provide enough information to answer this question."
+
 DEMO_QUESTIONS = [
-    {"question": "What is the biggest complaint about battery life?", "asin": None},
-    {"question": "Is the camera good for low light photos?", "asin": None},
-    {"question": "Is this product good value for the price?", "asin": None},
-    # Product-scoped example (a streaming device with 175 reviews in the
-    # sample, avg rating 4.4) -- shows the buyer-facing "ask about THIS
-    # product" use case from the project brief, not just corpus-wide search.
-    {"question": "Is this good for cutting cable TV?", "asin": "B00ZV9RDKK"},
+    {"question": "What is the biggest complaint about battery life?", "parent_asin": None},
+    {"question": "Is the camera good for low light photos?", "parent_asin": None},
+    {"question": "Is this product good value for the price?", "parent_asin": None},
+    # Product-scoped example (Fire TV Stick with Alexa Voice Remote --
+    # Previous Generation, 175 reviews in the sample, avg rating 4.4) --
+    # shows the buyer-facing "ask about THIS product" use case from the
+    # project brief, not just corpus-wide search.
+    {"question": "Is this good for cutting cable TV?", "parent_asin": "B075X8471B"},
 ]
 
 
@@ -75,14 +89,14 @@ class RAGChatbot:
         self.gen_tokenizer = AutoTokenizer.from_pretrained(FLAN_MODEL_NAME)
         self.gen_model = AutoModelForSeq2SeqLM.from_pretrained(FLAN_MODEL_NAME)
 
-    def retrieve(self, query: str, asin: str = None, top_k: int = TOP_K) -> pd.DataFrame:
+    def retrieve(self, query: str, parent_asin: str = None, top_k: int = TOP_K) -> pd.DataFrame:
         query_vec = self.embed_model.encode([query], normalize_embeddings=True)[0]
         scores = self.embeddings @ query_vec
 
-        if asin:
-            mask = (self.df["asin"] == asin).to_numpy()
+        if parent_asin:
+            mask = (self.df["parent_asin"] == parent_asin).to_numpy()
             if mask.sum() == 0:
-                print(f"(no reviews found for asin={asin}, searching the full corpus instead)")
+                print(f"(no reviews found for parent_asin={parent_asin}, searching the full corpus instead)")
             else:
                 scores = np.where(mask, scores, -1.0)
 
@@ -99,24 +113,29 @@ class RAGChatbot:
         context_text = "\n".join(context_blocks)
 
         prompt = (
-            "Answer the question using only the customer reviews below. "
+            "You are summarizing customer reviews for a shopper. Using only the "
+            "customer reviews below, write a 1-2 sentence answer to the question. "
+            "Explain the reasoning briefly instead of answering with a single word. "
             "If the reviews don't say, answer \"The reviews don't mention this.\"\n\n"
             f"{context_text}\n\n"
             f"Question: {question}\n"
-            "Answer:"
+            "Answer in 1-2 full sentences:"
         )
         inputs = self.gen_tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
         output_ids = self.gen_model.generate(**inputs, max_new_tokens=100, do_sample=False)
         return self.gen_tokenizer.decode(output_ids[0], skip_special_tokens=True).strip()
 
-    def ask(self, question: str, asin: str = None, top_k: int = TOP_K) -> dict:
-        context_reviews = self.retrieve(question, asin=asin, top_k=top_k)
-        answer = self.generate_answer(question, context_reviews)
-        return {"question": question, "asin": asin, "answer": answer, "supporting_reviews": context_reviews}
+    def ask(self, question: str, parent_asin: str = None, top_k: int = TOP_K) -> dict:
+        context_reviews = self.retrieve(question, parent_asin=parent_asin, top_k=top_k)
+        if context_reviews.empty or context_reviews["similarity"].max() < MIN_SIMILARITY_THRESHOLD:
+            answer = INSUFFICIENT_INFO_ANSWER
+        else:
+            answer = self.generate_answer(question, context_reviews)
+        return {"question": question, "parent_asin": parent_asin, "answer": answer, "supporting_reviews": context_reviews}
 
 
 def format_result(result: dict) -> str:
-    lines = [f'Question: "{result["question"]}"' + (f" (product {result['asin']})" if result["asin"] else "")]
+    lines = [f'Question: "{result["question"]}"' + (f" (product {result['parent_asin']})" if result["parent_asin"] else "")]
     lines.append(f"Answer: {result['answer']}")
     lines.append("Supporting reviews:")
     for _, row in result["supporting_reviews"].iterrows():
@@ -131,21 +150,21 @@ def main():
 
     args = sys.argv[1:]
     if args:
-        asin = None
-        if "--asin" in args:
-            idx = args.index("--asin")
-            asin = args[idx + 1]
+        parent_asin = None
+        if "--parent-asin" in args:
+            idx = args.index("--parent-asin")
+            parent_asin = args[idx + 1]
             args = args[:idx] + args[idx + 2:]
         question = " ".join(args)
-        result = bot.ask(question, asin=asin)
+        result = bot.ask(question, parent_asin=parent_asin)
         text = format_result(result)
         print("\n" + text)
         transcript.append(text)
     else:
         print("No question given -- running demo questions (try: "
-              'python3 src/rag_chatbot/rag_pipeline.py "your question" [--asin ASIN])')
+              'python3 src/rag_chatbot/rag_pipeline.py "your question" [--parent-asin PARENT_ASIN])')
         for item in DEMO_QUESTIONS:
-            result = bot.ask(item["question"], asin=item["asin"])
+            result = bot.ask(item["question"], parent_asin=item["parent_asin"])
             text = format_result(result)
             print("\n" + text)
             transcript.append(text)

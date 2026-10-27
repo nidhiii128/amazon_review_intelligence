@@ -1,0 +1,83 @@
+{
+  "full_seed42": {
+    "variant": "full",
+    "seed": 42,
+    "accuracy": 0.8884,
+    "macro_f1": 0.7178980889137905,
+    "f1_neutral": 0.44553846153846155,
+    "val_f1": 0.7174975315800806,
+    "minutes": 7.691275831063589
+  },
+  "full_seed43": {
+    "variant": "full",
+    "seed": 43,
+    "accuracy": 0.8919,
+    "macro_f1": 0.7206466646911219,
+    "f1_neutral": 0.44533333333333336,
+    "val_f1": 0.7192871791837664,
+    "minutes": 9.880057001113892
+  },
+  "full_seed44": {
+    "variant": "full",
+    "seed": 44,
+    "accuracy": 0.8936,
+    "macro_f1": 0.7261251747525009,
+    "f1_neutral": 0.44550408719346046,
+    "val_f1": 0.7250066517008792,
+    "minutes": 5.919195373853047
+  },
+  "no_weights_seed42": {
+    "variant": "no_weights",
+    "seed": 42,
+    "accuracy": 0.8989,
+    "macro_f1": 0.7065557524463428,
+    "f1_neutral": 0.39773645917542444,
+    "val_f1": 0.7109433894756066,
+    "minutes": 7.588163789113363
+  },
+  "no_weights_seed43": {
+    "variant": "no_weights",
+    "seed": 43,
+    "accuracy": 0.8999,
+    "macro_f1": 0.7181039238240174,
+    "f1_neutral": 0.42027800490596895,
+    "val_f1": 0.7116711038802818,
+    "minutes": 5.354792972405751
+  },
+  "no_weights_seed44": {
+    "variant": "no_weights",
+    "seed": 44,
+    "accuracy": 0.8971,
+    "macro_f1": 0.7032407477824201,
+    "f1_neutral": 0.39838709677419354,
+    "val_f1": 0.714519101147947,
+    "minutes": 5.949038863182068
+  },
+  "mean_pool_seed42": {
+    "variant": "mean_pool",
+    "seed": 42,
+    "accuracy": 0.8882,
+    "macro_f1": 0.7128400226779594,
+    "f1_neutral": 0.4321808510638298,
+    "val_f1": 0.7148603994187833,
+    "minutes": 5.529272023836771
+  },
+  "mean_pool_seed43": {
+    "variant": "mean_pool",
+    "seed": 43,
+    "accuracy": 0.8921,
+    "macro_f1": 0.7199389711725058,
+    "f1_neutral": 0.4329896907216495,
+    "val_f1": 0.722088560936525,
+    "minutes": 7.587188593546549
+  },
+  "mean_pool_seed44": {
+    "variant": "mean_pool",
+    "seed": 44,
+    "accuracy": 0.8859,
+    "macro_f1": 0.7113741782722317,
+    "f1_neutral": 0.4261658031088083,
+    "val_f1": 0.7139990926055196,
+    "minutes": 4.086326948801676
+  }
+}

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ReviewIQ Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: 594mm 841mm; margin: 0; }
+  :root { --navy:#131a2b; --navy2:#1f2a44; --accent:#e8622c; --blue:#2563eb; --teal:#0f766e; --ink:#1f2937; --muted:#5b6475; --line:#e4e1da; --paper:#faf9f6; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 2245px; height: 3179px; }
+  body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; color: var(--ink); background: var(--paper); font-size: 23px; line-height: 1.38; overflow: hidden; }
+
+  .header { height: 308px; background: linear-gradient(135deg, var(--navy), var(--navy2)); color: #fff; padding: 36px 56px; display: grid; grid-template-columns: 1fr 640px; gap: 40px; align-items: center; border-bottom: 10px solid var(--accent); }
+  .college { font-size: 30px; font-weight: 700; letter-spacing: 3px; color: #c8d2e6; text-transform: uppercase; }
+  .title { font-size: 104px; font-weight: 800; letter-spacing: -2px; line-height: 1.0; margin-top: 4px; }
+  .title span { color: var(--accent); }
+  .subtitle { font-size: 38px; font-weight: 500; color: #dbe3f3; margin-top: 8px; }
+  .team { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 14px 28px; font-size: 23px; line-height: 1.3; }
+  .team h4 { font-size: 19px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .team .row { display: flex; justify-content: space-between; padding: 2px 0; }
+  .team .row b { font-weight: 700; } .team .row span { color: #c8d2e6; font-variant-numeric: tabular-nums; }
+  .team .guide { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 22px 40px 0 40px; height: 2657px; }
+  .col { display: flex; flex-direction: column; gap: 26px; }
+  .card { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 24px 28px; box-shadow: 0 3px 10px rgba(19,26,43,0.06); }
+  .card.grow { flex: 1; }
+  h2 { font-size: 34px; font-weight: 800; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 14px; }
+  h2::before { content: ""; width: 12px; height: 34px; background: var(--accent); border-radius: 4px; }
+  h2.blue::before { background: var(--blue); } h2.teal::before { background: var(--teal); }
+  p { margin-bottom: 10px; }
+  ul { padding-left: 30px; } li { margin-bottom: 6px; }
+  .small { font-size: 19px; color: var(--muted); line-height: 1.3; }
+  .fig { width: 100%; display: block; border-radius: 10px; }
+  .cap { font-size: 18px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .stat { background: #fff7ed; border: 2px solid #fde0c8; border-radius: 14px; padding: 12px 16px; text-align: center; }
+  .stat b { display: block; font-size: 46px; font-weight: 800; color: var(--accent); line-height: 1.05; }
+  .stat span { font-size: 19px; color: var(--muted); }
+  .stat.blue { background: #eff6ff; border-color: #cfe0fb; } .stat.blue b { color: var(--blue); }
+  .stat.teal { background: #f0fdfa; border-color: #c4efe8; } .stat.teal b { color: var(--teal); }
+
+  .pill-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 6px 0 10px; }
+  .pill { font-size: 19px; font-weight: 600; padding: 4px 14px; border-radius: 999px; background: #eef1f7; color: var(--navy); }
+  .pill.blue { background: #dbeafe; color: #1e40af; } .pill.org { background: #ffe8d9; color: #9a3412; } .pill.teal { background: #ccfbf1; color: #115e59; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 21px; margin: 8px 0; }
+  th { text-align: right; font-weight: 700; color: var(--navy); border-bottom: 3px solid var(--navy); padding: 6px 8px; }
+  th:first-child, td:first-child { text-align: left; }
+  td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  tr.hl td { background: #fff4ec; font-weight: 600; }
+  td.best { font-weight: 800; color: var(--accent); }
+
+  .callout { background: var(--navy); color: #fff; border-radius: 14px; padding: 14px 20px; margin-top: 10px; font-size: 22px; }
+  .callout b { color: #ffb48f; }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .shots { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .shot img { width: 100%; display: block; border-radius: 10px; border: 2px solid var(--line); }
+  .quote { background: #fff8ec; border-left: 8px solid #f2b04a; border-radius: 8px; padding: 8px 14px; margin: 6px 0; font-size: 20px; }
+  .quote b { color: #9a3412; }
+
+  .footer { position: absolute; left: 0; right: 0; bottom: 0; height: 214px; background: var(--navy); color: #cdd6e8; padding: 16px 56px; display: grid; grid-template-columns: 1.3fr 1fr 0.62fr; gap: 36px; font-size: 18px; line-height: 1.28; }
+  .footer h3 { font-size: 22px; color: #fff; margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .footer b { color: #ffb48f; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="college">Vidyalankar Institute of Technology</div>
+    <div class="title">Review<span>IQ</span></div>
+    <div class="subtitle">AI-Based Product Review Intelligence and Consumer Insight System</div>
+    <div class="pill-row" style="margin-top:14px">
+      <span class="pill blue" style="font-size:24px">NLP</span><span class="pill org" style="font-size:24px">Deep Learning</span><span class="pill teal" style="font-size:24px">Advanced ML</span>
+    </div>
+  </div>
+  <div class="team">
+    <h4>Project Team</h4>
+    <div class="row"><b>Nidhi Bhawari</b><span>23102A0006</span></div>
+    <div class="row"><b>Aarti Sakpal</b><span>23102A0007</span></div>
+    <div class="row"><b>Gayatri Patil</b><span>23102A0016</span></div>
+    <div class="row"><b>Prachi Wakode</b><span>23102A0020</span></div>
+    <div class="guide">Guide: Prof. Sneha Annappanavar</div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- ============ COLUMN 1 ============ -->
+  <div class="col">
+    <div class="card">
+      <h2>Problem and Objectives</h2>
+      <p>A popular product can have thousands of free-text reviews that nobody can read in full. Buyers ask <b>"should I buy this?"</b>; sellers ask <b>"what should we improve?"</b></p>
+      <ul>
+        <li>Classify review sentiment (positive, neutral, negative) with NLP, deep learning and advanced ML models</li>
+        <li>Rank complaint areas by aspect (battery, sound, camera)</li>
+        <li>Score review helpfulness and flag suspicious reviews</li>
+        <li>Answer product questions from reviews, with evidence</li>
+        <li>Deliver everything in one interactive dashboard</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Dataset and Preprocessing</h2>
+      <div class="stats">
+        <div class="stat"><b>50,000</b><span>Amazon Electronics reviews</span></div>
+        <div class="stat blue"><b>34,365</b><span>products</span></div>
+        <div class="stat teal"><b>8,883</b><span>reviewers</span></div>
+        <div class="stat"><b>80 / 7 / 13</b><span>% positive / neutral / negative</span></div>
+      </div>
+      <p class="small">Amazon Reviews 2023, cleaned and labelled from star ratings (4-5 positive, 3 neutral, 1-2 negative). Product name, brand and image joined by parent ASIN. One shared 40,000 / 10,000 train and test split.</p>
+    </div>
+
+    <div class="card">
+      <h2>System Architecture</h2>
+      <img class="fig" src="../assets/poster_figs/poster_framework.png" style="width:97%;margin:0 auto">
+      <p class="cap">Reviews and metadata feed three branches, then product intelligence and grounded question answering.</p>
+    </div>
+
+    <div class="card">
+      <h2>Deep Learning Branch</h2>
+      <div style="display:grid;grid-template-columns:1.05fr 0.95fr;gap:18px;align-items:center">
+        <div>
+          <p><b>BiLSTM + Attention</b> trained from scratch: 14,937-word vocabulary, 2 x 128 bidirectional LSTM, 2.57 M parameters, class-weighted loss, about 7 minutes on a laptop GPU.</p>
+          <p><b>DistilBERT</b> fine-tuned on 6,000 reviews (CPU).</p>
+          <p class="small">The Deep Learning Lab page adds training curves, a confusion matrix, word clouds and a live classifier that highlights the words the LSTM attended to.</p>
+        </div>
+        <img class="fig" src="../assets/poster_figs/poster_lstm.png" style="width:88%;margin:0 auto">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+      <div class="card">
+        <h2 class="blue" style="font-size:30px">NLP</h2>
+        <ul style="padding-left:24px;font-size:21px">
+          <li><b>VADER</b> lexicon</li>
+          <li><b>TF-IDF</b> + LR / SVM</li>
+          <li><b>LDA</b>, 8 topics</li>
+          <li><b>Aspect sentiment</b> with evidence</li>
+          <li><b>MiniLM</b> search embeddings</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2 class="teal" style="font-size:30px">Advanced ML</h2>
+        <ul style="padding-left:24px;font-size:21px">
+          <li><b>XGBoost</b> helpfulness, 70.5% accuracy</li>
+          <li><b>MiniBatchKMeans</b>, k = 6</li>
+          <li><b>Isolation Forest</b>, 10% flagged</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COLUMN 2 ============ -->
+  <div class="col">
+    <div class="card">
+      <h2>Sentiment Results (10,000 test reviews)</h2>
+      <table>
+        <tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th><th>F1 neutral</th></tr>
+        <tr><td>VADER</td><td>.813</td><td>.512</td><td>.080</td></tr>
+        <tr><td>TF-IDF + LR</td><td>.860</td><td>.689</td><td>.400</td></tr>
+        <tr><td>TF-IDF + SVM</td><td>.888</td><td>.693</td><td>.382</td></tr>
+        <tr class="hl"><td>BiLSTM + Attention</td><td>.888</td><td class="best">.718</td><td class="best">.446</td></tr>
+        <tr class="hl"><td>DistilBERT</td><td class="best">.899</td><td>.702</td><td>.368</td></tr>
+      </table>
+      <img class="fig" src="../assets/poster_figs/poster_ci.png" style="width:93%;margin:8px auto 0">
+      <p class="cap">95% bootstrap intervals. BiLSTM beats the SVM on macro-F1 (+0.025, significant); DistilBERT is best on accuracy.</p>
+    </div>
+
+    <div class="card">
+      <h2>Ablation: What Drives the Gain?</h2>
+      <table>
+        <tr><th>LSTM variant (3 seeds, mean)</th><th>Accuracy</th><th>Macro-F1</th></tr>
+        <tr class="hl"><td>Full (attention + class weights)</td><td>.891</td><td class="best">.722</td></tr>
+        <tr><td>No class weights</td><td class="best">.899</td><td>.709</td></tr>
+        <tr><td>Mean pooling instead of attention</td><td>.889</td><td>.715</td></tr>
+      </table>
+      <div class="callout">Class weighting, <b>not attention</b>, drives most of the macro-F1 gain. Without it the LSTM matches DistilBERT's accuracy (<b>.899</b>).</div>
+    </div>
+
+    <div class="card">
+      <h2>Cost and Speed</h2>
+      <div class="stats" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:6px">
+        <div class="stat"><b>26x</b><span>fewer parameters than DistilBERT</span></div>
+        <div class="stat blue"><b>57x</b><span>faster on CPU (975 vs 17 reviews/s)</span></div>
+        <div class="stat teal"><b>13x</b><span>faster on GPU</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Training and Errors</h2>
+      <img class="fig" src="../assets/poster_figs/poster_dl_results.png">
+      <p style="margin-top:10px">155 of the LSTM's 1,116 test errors are confident, and many are <b>label noise</b>: the stars disagree with the text.</p>
+      <div class="quote"><b>5 stars, predicted negative:</b> "Piece of junk !!! Poor quality, high price .. it lasted 10weeks"</div>
+      <div class="quote"><b>1 star, predicted positive:</b> "Worked out of the box. love it"</div>
+    </div>
+
+    <div class="card grow">
+      <h2>What Each Sentiment Sounds Like</h2>
+      <div class="twocol">
+        <div><img class="fig" src="../../reports/figures/wordcloud_negative.png"><p class="cap">Negative</p></div>
+        <div><img class="fig" src="../../reports/figures/wordcloud_positive.png"><p class="cap">Positive</p></div>
+      </div>
+      <p class="small" style="margin-top:6px">Words weighted by how characteristic they are of each class: "return", "waste", "money" versus "easy", "love", "perfect".</p>
+    </div>
+  </div>
+
+  <!-- ============ COLUMN 3 ============ -->
+  <div class="col">
+    <div class="card">
+      <h2>Aspect Intelligence</h2>
+      <img class="fig" src="../assets/poster_figs/poster_aspects.png">
+      <div class="callout"><b>Battery</b> is the top complaint (20.2% negative mentions), then <b>connectivity</b> and <b>customer service</b> (19.3% each).</div>
+    </div>
+
+    <div class="card">
+      <h2>Grounded Question Answering</h2>
+      <p class="small">Product-scoped retrieval (MiniLM, top 5 reviews) plus FLAN-T5, with a <b>similarity floor</b>: weak evidence means "not enough information".</p>
+      <div class="stats" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:6px">
+        <div class="stat teal"><b>97.8%</b><span>answerable questions accepted</span></div>
+        <div class="stat"><b>95.6%</b><span>unanswerable questions declined</span></div>
+        <div class="stat blue"><b>100%</b><span>off-topic questions declined</span></div>
+      </div>
+      <p class="small">Semantic retrieval beat TF-IDF on paraphrased aspect queries (0.54 vs 0.32 aspect-mention rate at 5).</p>
+    </div>
+
+    <div class="card grow">
+      <h2>Interactive Dashboard</h2>
+      <div class="shots">
+        <div class="shot"><img src="../assets/poster_figs/03c_insights_trust_crop.png"><p class="cap"><b>Review Trust:</b> unsupervised Isolation Forest flags 4,999 reviews (10%) as potentially suspicious, with a threshold slider and reasons per review. No fake-review accuracy is claimed.</p></div>
+        <div class="shot"><img src="../assets/poster_figs/07d_dl_live_crop.png"><p class="cap">Deep Learning Lab: live classifier with attention</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Limitations</h2>
+      <ul class="small" style="font-size:20px">
+        <li>Labels come from star ratings, so some are noisy</li>
+        <li>Sample is a reviewer-grouped block of one category</li>
+        <li>DistilBERT saw one-sixth of the LSTM's data</li>
+        <li>Flagged reviews are anomalies, not confirmed fakes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>
+    <h3>Conclusion</h3>
+    NLP, deep learning and advanced ML on one corpus give buyers evidence-linked insight and sellers a ranked list of problems. A BiLSTM trained from scratch is <b>57x faster</b> than DistilBERT and matches its accuracy once class weights are removed; <b>battery</b> is the most criticised aspect; a similarity floor stops unsupported answers. <b>Future work:</b> full-data DistilBERT, learned aspects, human-annotated subsets, random multi-category sampling.
+  </div>
+  <div>
+    <h3>Key References</h3>
+    [1] Hutto and Gilbert, VADER, ICWSM 2014. [2] Hochreiter and Schmidhuber, LSTM, 1997. [3] Sanh et al., DistilBERT, 2019. [4] Chen and Guestrin, XGBoost, KDD 2016. [5] Liu et al., Isolation Forest, ICDM 2008. [6] Reimers and Gurevych, Sentence-BERT, EMNLP 2019. [7] Lewis et al., RAG, NeurIPS 2020. [8] Hou et al., Amazon Reviews 2023, 2024.
+  </div>
+  <div>
+    <h3>Vidyalankar Institute of Technology</h3>
+    <b>Guide: Prof. Sneha Annappanavar</b><br>Nidhi Bhawari, Aarti Sakpal,<br>Gayatri Patil, Prachi Wakode
+  </div>
+</div>
+
+</body>
+</html>

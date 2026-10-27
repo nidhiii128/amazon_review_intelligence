@@ -1,0 +1,210 @@
+{
+  "sentiment": {
+    "VADER": {
+      "accuracy": 0.8127,
+      "macro_f1": 0.5123875034171178,
+      "acc_ci": [
+        0.8044975,
+        0.82
+      ],
+      "f1_ci": [
+        0.5000308921657161,
+        0.5238911351666998
+      ],
+      "per_class_f1": [
+        0.550784475639967,
+        0.08,
+        0.9063780346113863
+      ]
+    },
+    "TF-IDF + LR": {
+      "accuracy": 0.8595,
+      "macro_f1": 0.6893750136009243,
+      "acc_ci": [
+        0.8524,
+        0.8663
+      ],
+      "f1_ci": [
+        0.6764800276198043,
+        0.7024811882299405
+      ],
+      "per_class_f1": [
+        0.7330078858430342,
+        0.39978094194961666,
+        0.9353362130101218
+      ]
+    },
+    "TF-IDF + SVM": {
+      "accuracy": 0.8879,
+      "macro_f1": 0.6931950502715747,
+      "acc_ci": [
+        0.8816,
+        0.8939
+      ],
+      "f1_ci": [
+        0.678531332887637,
+        0.707523682639874
+      ],
+      "per_class_f1": [
+        0.7470261697065821,
+        0.38212634822804314,
+        0.9504326328800989
+      ]
+    },
+    "BiLSTM + Attention": {
+      "accuracy": 0.8884,
+      "macro_f1": 0.7178980889137905,
+      "acc_ci": [
+        0.882,
+        0.8944
+      ],
+      "f1_ci": [
+        0.7043697873209568,
+        0.7311887564790027
+      ],
+      "per_class_f1": [
+        0.7543424317617866,
+        0.44553846153846155,
+        0.953813373441123
+      ]
+    },
+    "DistilBERT": {
+      "accuracy": 0.8989,
+      "macro_f1": 0.702179659225528,
+      "acc_ci": [
+        0.8926975,
+        0.9048
+      ],
+      "f1_ci": [
+        0.68771657538439,
+        0.7169143531401581
+      ],
+      "per_class_f1": [
+        0.7803837953091685,
+        0.368375325803649,
+        0.9577798565637667
+      ]
+    }
+  },
+  "paired": {
+    "BiLSTM + Attention - TF-IDF + SVM": {
+      "mean_diff": 0.024636425449271058,
+      "ci": [
+        0.01043942682116666,
+        0.03939690629793895
+      ],
+      "p_a_better": 0.9995
+    },
+    "BiLSTM + Attention - TF-IDF + SVM (accuracy)": {
+      "mean_diff": 0.0005350499999999986,
+      "ci": [
+        -0.0049000000000000155,
+        0.005800000000000027
+      ],
+      "p_a_better": 0.5715
+    },
+    "BiLSTM + Attention - DistilBERT": {
+      "mean_diff": 0.015554910911555652,
+      "ci": [
+        -0.00023164414818231668,
+        0.031228913323738467
+      ],
+      "p_a_better": 0.973
+    },
+    "BiLSTM + Attention - DistilBERT (accuracy)": {
+      "mean_diff": -0.010477250000000002,
+      "ci": [
+        -0.016199999999999992,
+        -0.004700000000000035
+      ],
+      "p_a_better": 0.0005
+    },
+    "DistilBERT - TF-IDF + SVM": {
+      "mean_diff": 0.009081514537715408,
+      "ci": [
+        -0.007647196518153229,
+        0.02604829038050215
+      ],
+      "p_a_better": 0.863
+    },
+    "DistilBERT - TF-IDF + SVM (accuracy)": {
+      "mean_diff": 0.0110123,
+      "ci": [
+        0.0049975000000000045,
+        0.016799999999999926
+      ],
+      "p_a_better": 1.0
+    }
+  },
+  "n_test": 10000,
+  "retrieval": {
+    "per_aspect": {
+      "battery": {
+        "semantic": 0.0,
+        "tfidf": 0.0
+      },
+      "camera": {
+        "semantic": 0.8,
+        "tfidf": 0.0
+      },
+      "display": {
+        "semantic": 0.4,
+        "tfidf": 0.8
+      },
+      "sound": {
+        "semantic": 1.0,
+        "tfidf": 0.8
+      },
+      "performance": {
+        "semantic": 0.8,
+        "tfidf": 0.6
+      },
+      "build_quality": {
+        "semantic": 0.2,
+        "tfidf": 0.0
+      },
+      "price_value": {
+        "semantic": 0.8,
+        "tfidf": 0.4
+      },
+      "connectivity": {
+        "semantic": 0.6,
+        "tfidf": 0.2
+      },
+      "size_comfort": {
+        "semantic": 0.6,
+        "tfidf": 0.2
+      },
+      "customer_service": {
+        "semantic": 0.2,
+        "tfidf": 0.2
+      }
+    },
+    "semantic_mean": 0.5399999999999999,
+    "tfidf_mean": 0.32000000000000006
+  },
+  "guardrail": {
+    "groups": {
+      "answerable": {
+        "mean_top1": 0.45477961434258357,
+        "median_top1": 0.443425714969635,
+        "frac_below_threshold": 0.022222222222222223,
+        "n": 45
+      },
+      "plausible_unanswerable": {
+        "mean_top1": 0.2182474598288536,
+        "median_top1": 0.22791028022766113,
+        "frac_below_threshold": 0.9555555555555556,
+        "n": 45
+      },
+      "off_topic": {
+        "mean_top1": 0.18427903420395322,
+        "median_top1": 0.18116086721420288,
+        "frac_below_threshold": 1.0,
+        "n": 45
+      }
+    },
+    "n_products": 9,
+    "threshold": 0.3
+  }
+}

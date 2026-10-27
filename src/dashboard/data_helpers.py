@@ -16,6 +16,7 @@ TOPICS_PATH = DATA_DIR / "electronics_reviews_with_topics.csv"
 ABSA_PATH = DATA_DIR / "absa_aspect_sentiments.csv"
 PRODUCTS_PATH = DATA_DIR / "products.csv"
 SUSPICIOUS_PATH = DATA_DIR / "suspicious_reviews.csv"
+LSTM_PRED_PATH = DATA_DIR / "lstm_predictions.csv"
 
 
 def load_reviews() -> pd.DataFrame:
@@ -50,6 +51,12 @@ def load_suspicious() -> pd.DataFrame:
     return pd.read_csv(SUSPICIOUS_PATH)
 
 
+def load_lstm_predictions() -> pd.DataFrame:
+    if not LSTM_PRED_PATH.exists():
+        return pd.DataFrame(columns=["review_id", "lstm_label", "lstm_confidence", "split"])
+    return pd.read_csv(LSTM_PRED_PATH)
+
+
 def display_name(products: pd.DataFrame, parent_asin: str) -> str:
     """Product name if metadata was found for this parent_asin, otherwise
     a graceful fallback so the UI never shows a blank."""
@@ -82,6 +89,35 @@ def get_top_products(reviews: pd.DataFrame, products: pd.DataFrame = None, n: in
         "Product " + agg["parent_asin"].astype(str)
     )
     return agg
+
+
+def get_product_table(reviews: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
+    """One row per product listing with everything a shop card needs:
+    name, image, review count, average rating and % positive reviews."""
+    agg = (
+        reviews.groupby("parent_asin")
+        .agg(review_count=("review_id", "count"), avg_rating=("rating", "mean"),
+             positive_pct=("sentiment_label", lambda s: (s == "positive").mean() * 100))
+        .reset_index()
+    )
+    agg["avg_rating"] = agg["avg_rating"].round(2)
+    agg["positive_pct"] = agg["positive_pct"].round(0)
+    agg = agg.merge(products[["parent_asin", "product_name", "brand", "image_url"]], on="parent_asin", how="left")
+    agg["product_name"] = agg["product_name"].fillna("Product " + agg["parent_asin"].astype(str))
+    return agg
+
+
+def get_best_for_aspect(absa: pd.DataFrame, table: pd.DataFrame, aspect: str, min_mentions: int = 5, n: int = 5) -> pd.DataFrame:
+    """Products whose reviewers speak best about one aspect (e.g. battery),
+    ranked by % positive mentions, needing a minimum number of mentions."""
+    sub = absa[absa["aspect"] == aspect]
+    g = (
+        sub.groupby("parent_asin")
+        .agg(mentions=("aspect", "size"), aspect_pos=("aspect_sentiment", lambda s: (s == "positive").mean() * 100))
+        .reset_index()
+    )
+    g = g[g["mentions"] >= min_mentions].sort_values(["aspect_pos", "mentions"], ascending=False).head(n)
+    return g.merge(table, on="parent_asin", how="left")
 
 
 def search_products_by_name(products: pd.DataFrame, query: str) -> pd.DataFrame:
@@ -233,14 +269,19 @@ def get_top_helpful_predicted(df: pd.DataFrame, model, feature_cols: list, build
     ]
 
 
-def get_suspicious_summary_for_asin(suspicious: pd.DataFrame, reviews: pd.DataFrame, parent_asin: str) -> dict:
-    review_ids = reviews[reviews["parent_asin"] == parent_asin]["review_id"]
-    sub = suspicious[suspicious["review_id"].isin(review_ids)]
-    return {
-        "total": len(sub),
-        "normal": int((sub["suspicion_label"] == "normal").sum()),
-        "suspicious": int((sub["suspicion_label"] == "potentially_suspicious").sum()),
-        "flagged": sub[sub["suspicion_label"] == "potentially_suspicious"].sort_values(
-            "suspicion_score", ascending=False
-        ),
-    }
+def build_suspicious_table(suspicious: pd.DataFrame, reviews: pd.DataFrame, threshold: float, parent_asin: str = None) -> pd.DataFrame:
+    """Suspicion scores joined with the actual review text/rating for
+    display, plus a threshold-driven `red_flag` column -- the UI's
+    flagging line is adjustable via the threshold slider rather than
+    fixed to the model's training-time contamination rate, and score +
+    review are always shown side by side (never just a score in isolation)."""
+    cols = ["review_id", "red_flag", "suspicion_score", "rating", "clean_text", "reasons"]
+    if suspicious.empty:
+        return pd.DataFrame(columns=cols)
+    merged = suspicious.merge(
+        reviews[["review_id", "parent_asin", "rating", "clean_text"]], on="review_id", how="left"
+    )
+    if parent_asin:
+        merged = merged[merged["parent_asin"] == parent_asin]
+    merged["red_flag"] = merged["suspicion_score"] >= threshold
+    return merged.sort_values("suspicion_score", ascending=False)[cols]

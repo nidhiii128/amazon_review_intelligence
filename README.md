@@ -69,6 +69,11 @@ pip install -r requirements-deep-learning.txt
 python3 src/deep_learning/bert_finetune.py  # -> models/bert_sentiment/, reports/metrics/bert_results.txt
 python3 src/sentiment/compare_models.py     # re-run to add BERT to the comparison chart
 
+# Deep learning: LSTM classifier + word clouds (PyTorch; uses the GPU if present, ~7 min on a laptop GPU)
+python3 src/deep_learning/lstm_sentiment.py    # -> models/lstm_sentiment.pt, reports/metrics/lstm_results.txt, curves, confusion matrix
+python3 src/visualization/wordclouds.py        # -> reports/figures/wordcloud_*.png
+python3 src/sentiment/compare_models.py        # re-run to add the LSTM to the comparison chart
+
 # Milestone 4:
 pip install xgboost
 python3 src/advanced_ml/helpfulness_xgboost.py       # -> reports/metrics/xgboost_helpfulness_results.txt
@@ -398,16 +403,88 @@ load time, so re-running metadata_prep.py never requires reprocessing the
 not a fake-review classifier -- there is no labelled fake/genuine ground
 truth for this dataset, so no accuracy figure is reported anywhere in its
 output, and the UI never claims a review "is fake," only that it is
-"potentially suspicious based on automated pattern analysis." Features:
-rating, review length, capital-letter ratio, exclamation count, verified
-purchase, review age, and `max_similarity_within_product` -- the highest
-cosine similarity to any other review of the *same* parent_asin, reusing
-the Milestone 5 sentence embeddings (no new embedding pass), computed
-per-product rather than a full 50k x 50k matrix. `StandardScaler` +
-`IsolationForest(contamination=0.10)` flags ~10% of reviews; each flagged
-review also gets a short rule-based `reasons` string (e.g. "very short
-review", "near-duplicate text", "unusually high capital-letter ratio") for
-explainability, separate from the model's own anomaly score. On the actual
-50k-review sample, the highest-scoring flags are dominated by ALL-CAPS,
-exclamation-heavy angry reviews -- a sensible, explainable pattern, not
-evidence of coordinated fraud (which the tool doesn't claim to detect).
+"potentially suspicious based on automated pattern analysis."
+
+An earlier version fed raw `rating` and raw `review_length_words` directly
+into IsolationForest, which backfired: those features aren't
+fraud-directional, so the model mostly flagged long, detailed, negative
+reviews as "suspicious" simply because they're numerically rare in a
+mostly-short-mostly-positive sample (rating's own review confirmed this
+by inspecting correlations -- length corr +0.55, rating corr -0.42 with
+the score, i.e. backwards). Fixed by switching to directional/binary
+features and adding a real signal that had been missing entirely: some
+`user_id`s have 200-600+ reviews in this 50k sample, a well-established
+red flag for bot/professional-reviewer accounts.
+
+Current features: `is_short_text` (binary -- length itself is never
+suspicious, only *very short*), `capital_ratio`, `exclamation_count`,
+`verified_purchase_int`, `reviewer_review_count_log` (log1p of how many
+reviews that user_id has in the sample), and
+`max_similarity_within_product` -- the highest cosine similarity to any
+other review of the *same* parent_asin, reusing the Milestone 5 sentence
+embeddings (no new embedding pass), computed per-product rather than a
+full 50k x 50k matrix. `StandardScaler` + `IsolationForest
+(contamination=0.10)` flags ~10% of reviews; each flagged review also
+gets a short rule-based `reasons` string (e.g. "very short review",
+"near-duplicate text", "reviewer has posted N reviews in this sample",
+"unverified purchase") for explainability, separate from the model's own
+anomaly score. On the actual 50k-review sample, the highest-scoring flags
+are now templated one-liners ("Five Stars. Love it!!!"), ALL-CAPS
+emotional reviews, and effusive-praise reviews from high-volume unverified
+accounts -- patterns that actually match the intuitive meaning of
+"suspicious," not evidence of coordinated fraud (which the tool doesn't
+claim to detect). The dashboard's Review Trust tables also expose a
+threshold slider so this cutoff is adjustable at view time, not fixed to
+the training-time contamination rate.
+
+## Deep learning: BiLSTM + Attention, word clouds, Deep Learning Lab
+
+`src/deep_learning/lstm_sentiment.py` trains a bidirectional 2-layer LSTM with
+attention pooling (PyTorch, embeddings learned from scratch, 15k-token vocab)
+to classify reviews as positive / neutral / negative. It is evaluated on the
+same stratified 80/20 test split as the TF-IDF models and DistilBERT; 10% of
+the training portion is held out for early stopping on validation macro-F1.
+The loss is class-weighted (square-root inverse frequency) because the data is
+~80% positive.
+
+Test results (10,000 held-out reviews): **accuracy 88.8%, macro-F1 0.718** --
+the best macro-F1 of all models (DistilBERT 0.702, SVM 0.693), mainly through
+a better neutral class (F1 0.446). DistilBERT keeps the best raw accuracy
+(89.9%). Honest caveats: the TF-IDF models and the LSTM all use class
+weighting (which helps macro-F1), and DistilBERT was fine-tuned on only 6,000
+reviews (CPU run), so it is under-trained relative to the 36,000-review LSTM.
+
+`src/visualization/wordclouds.py` draws one word cloud per sentiment class,
+weighting words by within-class frequency times how over-represented they are
+versus the whole corpus, so each cloud shows distinctive language ("refund",
+"return", "waste" vs "love", "easy") rather than the same generic words.
+
+The dashboard's **Deep Learning Lab** page shows the architecture, training
+curves, confusion matrix, per-class metrics, the five-model comparison, the
+word clouds, and a live classifier that runs the LSTM (with attention
+highlighting), DistilBERT and the TF-IDF SVM side by side. Product pages also
+show the LSTM's prediction per review, flagged by train/val/test split so
+in-sample predictions aren't mistaken for held-out ones. The Model Insights
+and Home pages are organised into three equal pillars: NLP, Deep Learning,
+Advanced ML.
+
+## Current dashboard layout (live-demo build)
+
+The dashboard was simplified into a shop-style app with five pages, so a
+demo follows one story: find a product, see what reviewers say, check how
+far to trust them, ask a question.
+
+- **Shop**: search (sidebar), "Most reviewed" and "Highest rated" shelves, and
+  "Shop by what matters" tiles (best products for battery, sound, camera ...).
+- **Product Insights**: summary, aspect analysis with evidence sentences,
+  filterable reviews with the LSTM's reading of each, and Review Trust with
+  the suspicion-threshold slider.
+- **Compare**: two products side by side.
+- **Ask ReviewIQ**: product-scoped answers with the retrieved evidence; weak
+  evidence gives "not enough information".
+- **Seller Insights**: complaint ranking, most informative reviews, flagged reviews.
+
+Run it with `streamlit run src/dashboard/app.py`. The explanatory pages
+(Deep Learning Lab, Model Insights, About, the old Explore page) are kept
+unrouted in `src/dashboard/archive/`; move one back into `sections/` and add
+it to `PAGES` in `widgets.py` and the router in `app.py` to restore it.

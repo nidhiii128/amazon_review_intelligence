@@ -104,7 +104,16 @@ def build_products_csv():
             images = obj.get("images") or []
             if images:
                 first = images[0]
-                image_url = first.get("large_image_url") or first.get("hi_res") or first.get("thumb")
+                image_url = (
+                    first.get("large_image_url") or first.get("large")
+                    or first.get("hi_res") or first.get("thumb")
+                )
+                if not image_url:
+                    image_url = next(
+                        (img.get("large") or img.get("hi_res") or img.get("thumb")
+                         for img in images if img.get("large") or img.get("hi_res") or img.get("thumb")),
+                        None,
+                    )
 
             rows.append({
                 "parent_asin": obj.get("parent_asin"),

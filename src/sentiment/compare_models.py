@@ -1,6 +1,7 @@
 """
 Builds a bar chart comparing all sentiment models run so far: VADER,
-TF-IDF+LR, TF-IDF+SVM, and (if it has been run) fine-tuned DistilBERT.
+TF-IDF+LR, TF-IDF+SVM, and (if they have been run) the BiLSTM+Attention
+and fine-tuned DistilBERT.
 Safe to run at any point in the project -- models that haven't been run
 yet are just skipped.
 """
@@ -56,6 +57,16 @@ def load_bert():
     return acc, f1
 
 
+def load_lstm():
+    path = METRICS_DIR / "lstm_results.txt"
+    if not path.exists():
+        return None
+    text = path.read_text()
+    acc = float(re.search(r"Accuracy: ([\d.]+)", text).group(1))
+    f1 = macro_f1_from_report(text)
+    return acc, f1
+
+
 def main():
     models = {}
 
@@ -66,6 +77,10 @@ def main():
     tfidf = load_tfidf()
     if tfidf:
         models.update(tfidf)
+
+    lstm = load_lstm()
+    if lstm:
+        models["BiLSTM +\nAttention"] = lstm
 
     bert = load_bert()
     if bert:

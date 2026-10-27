@@ -1,0 +1,25 @@
+=== BiLSTM + Attention Sentiment Classification (PyTorch) ===
+Device: cuda
+Train size: 36,000 | Validation size: 4,000 | Test size: 10,000
+Vocabulary: 14,937 tokens | Max length: 200 | Embedding: 128 | Hidden: 128 x 2 layers (bidirectional)
+Trainable parameters: 2,572,420
+Epochs run: 9 (best epoch by val macro-F1: 6) | Training time: 7.0 minutes
+
+Accuracy: 0.8884
+Macro F1: 0.7179
+
+Classification report:
+              precision    recall  f1-score   support
+
+    negative      0.786     0.725     0.754      1258
+     neutral      0.392     0.516     0.446       701
+    positive      0.961     0.946     0.954      8041
+
+    accuracy                          0.888     10000
+   macro avg      0.713     0.729     0.718     10000
+weighted avg      0.899     0.888     0.893     10000
+
+Confusion matrix (rows=true, cols=pred), label order = negative, neutral, positive:
+[[ 912  231  115]
+ [ 148  362  191]
+ [ 100  331 7610]]

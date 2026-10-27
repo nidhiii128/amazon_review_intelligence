@@ -7,9 +7,24 @@ not a "fake review classifier" -- no accuracy claim is made anywhere in
 its output. Flagged reviews are "potentially suspicious based on
 automated pattern analysis," never asserted to be fake.
 
-Features:
-  - rating, review_length_words, capital_ratio, exclamation_count,
-    verified_purchase_int, review_age_days (cheap text/metadata signals)
+Features are deliberately chosen for fraud-*directionality*, not just
+statistical rarity -- an earlier version fed raw `rating` and raw
+`review_length_words` directly into the model, and IsolationForest ended
+up flagging long, detailed, negative reviews as "suspicious" simply
+because they're numerically rare in a mostly-short-mostly-positive
+dataset (verified by inspecting correlations: length corr +0.55, rating
+corr -0.42 with the score -- backwards from what "suspicious" should
+mean). Fixed by using directional/binary transforms and adding a real
+fraud signal that was missing entirely:
+  - is_short_text: binary (very short reviews are the classic low-effort
+    pattern -- being long is never itself suspicious, so raw word count
+    is not used).
+  - capital_ratio, exclamation_count: emotional/spam-style text markers.
+  - verified_purchase_int.
+  - reviewer_review_count_log: log1p of how many reviews that same
+    user_id has in this sample -- a small number of accounts have
+    200-600+ reviews here, a well-established signal for bot/professional
+    reviewer accounts, and it wasn't used at all before this fix.
   - max_similarity_within_product: the highest cosine similarity between
     this review and any other review of the *same* parent_asin, reusing
     the Milestone 5 sentence embeddings (no new embedding pass). Computed
@@ -47,10 +62,12 @@ SIMILAR_THRESHOLD = 0.85
 SHORT_REVIEW_WORDS = 10
 HIGH_CAPITAL_RATIO = 0.3
 MANY_EXCLAMATIONS = 3
+PROLIFIC_REVIEWER_THRESHOLD = 20  # ~95th percentile of reviews-per-user in the sample
 
 FEATURE_COLS = [
-    "rating", "review_length_words", "capital_ratio", "exclamation_count",
-    "verified_purchase_int", "review_age_days", "max_similarity_within_product",
+    "is_short_text", "capital_ratio", "exclamation_count",
+    "verified_purchase_int", "max_similarity_within_product",
+    "reviewer_review_count_log",
 ]
 
 
@@ -64,12 +81,13 @@ def capital_ratio(text: str) -> float:
 
 def build_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
-    max_ts = df["timestamp"].max()
-    df["review_age_days"] = (max_ts - df["timestamp"]).dt.days.fillna(0)
     df["verified_purchase_int"] = df["verified_purchase"].astype(int)
     df["exclamation_count"] = df["clean_text"].fillna("").astype(str).str.count(r"!")
     df["capital_ratio"] = df["clean_text"].fillna("").apply(capital_ratio)
+    df["is_short_text"] = (df["review_length_words"] < SHORT_REVIEW_WORDS).astype(int)
+    reviewer_counts = df["user_id"].value_counts()
+    df["reviewer_review_count"] = df["user_id"].map(reviewer_counts)
+    df["reviewer_review_count_log"] = np.log1p(df["reviewer_review_count"])
     return df
 
 
@@ -90,7 +108,7 @@ def compute_max_similarity_within_product(df: pd.DataFrame, embeddings: np.ndarr
 
 def build_reasons(row: pd.Series) -> str:
     reasons = []
-    if row["review_length_words"] < SHORT_REVIEW_WORDS:
+    if row["is_short_text"]:
         reasons.append("very short review")
     if row["max_similarity_within_product"] >= NEAR_DUPLICATE_THRESHOLD:
         reasons.append("near-duplicate text")
@@ -100,6 +118,10 @@ def build_reasons(row: pd.Series) -> str:
         reasons.append("unusually high capital-letter ratio")
     if row["exclamation_count"] >= MANY_EXCLAMATIONS:
         reasons.append("many exclamation marks")
+    if row["reviewer_review_count"] >= PROLIFIC_REVIEWER_THRESHOLD:
+        reasons.append(f"reviewer has posted {int(row['reviewer_review_count'])} reviews in this sample")
+    if not row["verified_purchase_int"]:
+        reasons.append("unverified purchase")
     if not reasons:
         reasons.append("unusual combination of review features")
     return "; ".join(reasons)
